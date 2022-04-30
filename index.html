@@ -56,9 +56,6 @@
         // Get the data from the URL
         var pivotData = response.getDataTable();
 
-        // Create a dashboard to store chart and control
-        var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
-
         // The control that filters the plot
         var sectionChooser = new google.visualization.ControlWrapper({
           'controlType': 'CategoryFilter',
@@ -89,8 +86,8 @@
           'containerId': 'the_plot_div',
           'options': {
             'legend': { position: 'none' },
-            //'title': 'Histogram of GA Base Salary by Department',
-            'chartArea': {width: '75%', height: '75%', top: '3%'},
+            'title': 'Histogram of GA Base Salary of SCHOOL OF LIFE SCIENCES',
+            'chartArea': {width: '75%', height: '75%', top: '5%'},
             'isStacked': true,
             bar: {groupWidth: "30"},
             hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
@@ -100,6 +97,20 @@
           },
           'view': {'columns': result}
         });
+
+        // create "statechange" event listeners for the CategoryFilters (this is for custom title)
+        google.visualization.events.addListener(sectionChooser, 'statechange', changeTitle);
+
+        // function to change title
+        function changeTitle () {
+          var department = sectionChooser.getState().selectedValues[0];
+          let pre_title = "Histogram of GA Base Salary of ";
+          the_plot.setOption('title', pre_title.concat(department));
+          the_plot.draw();
+        }
+
+        // Create a dashboard to store chart and control
+        var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
 
         // bind the filter to the plot
         dashboard.bind(sectionChooser, the_plot);
@@ -195,21 +206,23 @@
     </script>
   </head>
   <style>
-    table, th, td {
-      border:1px solid black;
+    th, td {
+      border: 5px solid black;
+      border-style: inset;
+      border-radius: 20px;
     }
     .goog-menu-vertical {
-      max-height: 500px;
-      max-width: 300px;
+      max-height: 600px;
+      max-width: 400px;
       text-align: left;
       overflow-y: auto;
     }
   </style>
   <body>
     <br>
-    <h1>The UHM: GA Base Salary Plots</h1>
-    <p style="font-size: 20px">Below are some plots made with the publically avaiable Graduate Assistance Compensation data from 2022!</p>
-    <a href="https://form.jotform.com/220947446792063" style="font-size: 28px"><b>SIGN THE PETITION!!</b></a>
+    <h1 align="center">The UHM: GA Base Salary Plots</h1>
+    <p align="center" style="font-size: 20px">Below are some plots made with the publically avaiable Graduate Assistance Compensation data from 2022!</p>
+    <p align="center"><a href="https://form.jotform.com/220947446792063"style="font-size: 28px"><b>SIGN THE PETITION!!</b></a></p>
 
     <div id="dashboard_div" >
       <table align="center" cellpadding="0" style="width: 100%;">
