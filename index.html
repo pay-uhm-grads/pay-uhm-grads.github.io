@@ -2,153 +2,64 @@
   <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
+      // Load Dependancies
       google.charts.load('current', {
         'packages': ['table','corechart', 'bar', 'controls'],
       });
-      google.charts.setOnLoadCallback(initialize);
-      google.charts.setOnLoadCallback(pivot_initialize);
-      google.charts.setOnLoadCallback(pivot_initialize2);
-      google.charts.setOnLoadCallback(pivot_initialize_the_plot);
 
-      function initialize() {
-        // The URL of the spreadsheet to source data from.
-        var query = new google.visualization.Query(
-          'https://spreadsheets.google.com/tq?key=1YarYCKDv2yjVppOXP-f29iC7a5H1kF8kcCaoplJBPyQ');
+      // Calling the Functions
+      google.charts.setOnLoadCallback(initialize_the_plot);
+      google.charts.setOnLoadCallback(initialize_overall_hist);
+      google.charts.setOnLoadCallback(initialize_pay_percent);
+      google.charts.setOnLoadCallback(initialize_data_table);
 
-        query.send(draw);
-      }
-
-      function pivot_initialize() {
-        // The URL to the PIVOT TABLE (PAY ROW / SEC COLUMN)
-        var pivot_query = new google.visualization.Query(
-          'https://spreadsheets.google.com/tq?key=1hYSaDO9c_VMS2Is_1VpoZbBWp1HK_wFMQf-M4GHAWuY&headers=1');
-
-        pivot_query.send(pivot_draw);
-      }
-
-      function pivot_initialize2() {
-        // The URL to the PIVOT TABLE (PAY ROW / SEC COLUMN)
-        var pivot_query2 = new google.visualization.Query(
-          'https://spreadsheets.google.com/tq?key=1hYSaDO9c_VMS2Is_1VpoZbBWp1HK_wFMQf-M4GHAWuY&headers=1');
-
-        pivot_query2.send(pivot_draw2);
-      }
-
-      function pivot_initialize_the_plot() {
-        // The URL to the PIVOT TABLE (PAY ROW / SEC COLUMN)
-        var pivot_the_plot_query = new google.visualization.Query(
+      // Load The data to be used in the Main Plot
+      function initialize_the_plot() {
+        var the_plot_query = new google.visualization.Query(
           'https://spreadsheets.google.com/tq?key=1Ms3ha5UALbaC-ArBPefzXjM3rlQnviNpPmc_1T_RoT4&headers=1');
 
-        pivot_the_plot_query.send(pivot_the_plot);
+        the_plot_query.send(make_the_plot);
       }
 
-      function draw(response) {
-        if (response.isError()) {
-          alert('Error in query');
-        }
+      // Load the data that has the total count of pay
+      function initialize_overall_hist() {
+        var overall_hist_query = new google.visualization.Query(
+          'https://spreadsheets.google.com/tq?key=1TsSzYte5BAFWg94ZOmVh0xqKbm-ofNWtZxw8MWQTm_o&headers=1');
 
-        // this is the data that was just loaded
-        var fullData = response.getDataTable();
-
-        // make a table with the data we just loaded
-        var full_table = new google.visualization.Table(
-            document.getElementById('full_table_div'));
-        full_table.draw(fullData, {showRowNumber: false, width: '100%', height: '100%'});
-
-
-        // let's make a subset of data using DataView
-        var view = new google.visualization.DataView(fullData);
-
-        // set the range of DataView
-        view.setColumns([2, 5])
-
-        // histogram options
-        var hist_options = {
-          title: 'Histogram of UHM GAs Salary (9 and 11 month)',
-          legend: { position: 'none' },
-          hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
-            slantedText: true, slantedTextAngle:90, format: '$##,###'}
-        };
-
-        // make histogram of the DataView
-        var view_hist =
-            new google.visualization.Histogram(document.getElementById('view_hist'));
-        view_hist.draw(view, hist_options)
-
-
-        // let's make a grouped data from the base
-        var sect_group = google.visualization.data.group(
-          fullData,
-          [0],
-          [{'column': 5, 'aggregation': google.visualization.data.Sum, 'type': 'number'}]
-        );
-
-        var group_table = new google.visualization.Table(
-            document.getElementById('group_table_div'));
-        group_table.draw(fullData, {showRowNumber: false, width: '100%', height: '100%'});
+        overall_hist_query.send(make_overall_hist);
       }
 
-      function pivot_draw(response) {
+      // Load the data that has the department breakdown
+      function initialize_pay_percent() {
+        var overall_pay_percent = new google.visualization.Query(
+          'https://spreadsheets.google.com/tq?key=1hYSaDO9c_VMS2Is_1VpoZbBWp1HK_wFMQf-M4GHAWuY&headers=1');
+
+        overall_pay_percent.send(make_pay_percent);
+      }
+
+      // Load the data that has the nice table
+      function initialize_data_table() {
+        var overall_data_table = new google.visualization.Query(
+          'https://spreadsheets.google.com/tq?key=1YarYCKDv2yjVppOXP-f29iC7a5H1kF8kcCaoplJBPyQ&headers=1');
+
+        overall_data_table.send(make_data_table);
+      }
+
+
+      // Make The PLOT
+      function make_the_plot(response) {
+        // In case the URL doesn't work
         if (response.isError()) {
           alert('Error in pivot query');
         }
 
-        // this is the data that was just loaded
+        // Get the data from the URL
         var pivotData = response.getDataTable();
 
-        // make a table with the data we just loaded
-        //var pivot_table = new google.visualization.Table(
-        //    document.getElementById('pivot_table_div'));
-        //pivot_table.draw(pivotData, {showRowNumber: false, width: '100%', height: '100%'});
-
-        // let's make a bar chart yo
-        var bar_options = {
-          title: 'Bar Chart of UHM GAs Salary (9 and 11 month)',
-          legend: { position: 'none' },
-          isStacked: true,
-          width: '100%',
-          height: '100%',
-          hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
-          slantedText: true, slantedTextAngle:90, format: '$##,###'}
-        };
-
-        var pivot_bar = new google.visualization.ColumnChart(document.getElementById("pivot_bar_div"));
-        pivot_bar.draw(pivotData, bar_options);
-      }
-
-      function pivot_draw2(response) {
-        if (response.isError()) {
-          alert('Error in pivot query');
-        }
-
-        // this is the data that was just loaded
-        var pivotData = response.getDataTable();
-
-        // let's make a bar chart yo
-        var bar_options = {
-          title: 'Bar Chart of UHM GAs Salary (Percentage)',
-          legend: { position: 'none' },
-          isStacked: 'percent',
-          hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
-          slantedText: true, slantedTextAngle:90, format: '$##,###'}
-        };
-
-        var pivot_bar = new google.visualization.ColumnChart(document.getElementById("pivot_bar2_div"));
-        pivot_bar.draw(pivotData, bar_options);
-      }
-
-      function pivot_the_plot(response) {
-        if (response.isError()) {
-          alert('Error in pivot query');
-        }
-
-        // this is the data that was just loaded
-        var pivotData = response.getDataTable();
-
-        // Create a dashboard.
+        // Create a dashboard to store chart and control
         var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
 
-        // THE FILTER
+        // The control that filters the plot
         var sectionChooser = new google.visualization.ControlWrapper({
           'controlType': 'CategoryFilter',
           'containerId': 'the_filter_div',
@@ -156,104 +67,193 @@
             'filterColumnIndex': 0,
             'ui': {
               'labelStacking': 'vertical',
-              'label': 'Department Selection: (You can type too)',
+              'label': '',
               'allowTyping': true,
               'allowMultiple': false,
-              'cssClass': 'the_filter_div'
-
+              'chartArea': {height: '200px'}
             }
           },
           'state': {'selectedValues': ['SCHOOL OF LIFE SCIENCES']}
         });
 
-        // just to make a freaking list
+        // Function just to get a array of ascending ints...
         function range(start, end) {
           return Array(end - start + 1).fill().map((_, idx) => start + idx)
         }
         var result = range(1, 120);
         //result.unshift(0);
 
-        // make a chart wrapper yo
+        // This is the chart AKA THE PLOT
         var the_plot = new google.visualization.ChartWrapper({
           'chartType': 'ColumnChart',
           'containerId': 'the_plot_div',
           'options': {
             'legend': { position: 'none' },
-            'title': 'Histogram of GA Base Salary by Department',
+            //'title': 'Histogram of GA Base Salary by Department',
+            'chartArea': {width: '75%', height: '75%', top: '3%'},
             'isStacked': true,
             bar: {groupWidth: "30"},
             hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
-            slantedText: true, slantedTextAngle:90, format: '$##,###', title: 'base salary', minValue: 18500, maxValue: 36000},
-            vAxis: {format: '####', title: 'Count of GAs'}
+            slantedText: true, slantedTextAngle:90, format: '$##,###', title: 'base salary',
+            minValue: 18500, maxValue: 36000},
+            vAxis: {format: '####', title: 'Number of GAs'}
           },
           'view': {'columns': result}
         });
 
-
-        // bind the filter
+        // bind the filter to the plot
         dashboard.bind(sectionChooser, the_plot);
 
-        // Draw the dashboard.
+        // Draw the dashboard
         dashboard.draw(pivotData);
 
       }
 
+      // Make overall histogram
+      function make_overall_hist(response) {
+        // In case the URL doesn't work
+        if (response.isError()) {
+          alert('Error in pivot query');
+        }
 
+        // Get the data from the URL
+        var overallData = response.getDataTable();
+
+        // set bar_options
+        var bar_options = {
+          legend: { position: 'none' },
+          isStacked: false,
+          width: '100%',
+          height: '100%',
+          bar: {groupWidth: "69%"},
+          chartArea: {width: '75%', height: '75%', top: '3%'},
+          hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
+          slantedText: true, slantedTextAngle:90, format: '$##,###', title: 'base salary',
+          minValue: 18500, maxValue: 36000},
+          vAxis: {format: '####', title: 'Number of GAs'}
+        };
+
+        // make the bar plot
+        var overall_hist = new google.visualization.ColumnChart(document.getElementById("overall_hist_div"));
+
+        // Draw the chart
+        overall_hist.draw(overallData, bar_options);
+      }
+
+
+      // Make overall histogram
+      function make_pay_percent(response) {
+        // In case the URL doesn't work
+        if (response.isError()) {
+          alert('Error in pivot query');
+        }
+
+        // Get the data from the URL
+        var breakdownData = response.getDataTable();
+
+        // set bar_options
+        var bar_options = {
+          legend: { position: 'none' },
+          isStacked: 'percent',
+          width: '100%',
+          height: '100%',
+          bar: {groupWidth: "69%"},
+          chartArea: {width: '75%', height: '75%', top: '3%'},
+          hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
+          slantedText: true, slantedTextAngle:90, format: '$##,###', title: 'base salary',
+          minValue: 18500, maxValue: 36000},
+          vAxis: {title: 'Percentage'}
+        };
+
+        // make the bar plot
+        var pay_percent = new google.visualization.ColumnChart(document.getElementById("pay_percent_div"));
+
+        // Draw the chart
+        pay_percent.draw(breakdownData, bar_options);
+      }
+
+      // Make nice data table
+      function make_data_table(response) {
+        // In case the URL doesn't work
+        if (response.isError()) {
+          alert('Error in pivot query');
+        }
+
+        // Get the data from the URL
+        var niceData = response.getDataTable();
+
+        // make a table with the data we just loaded
+        var full_table = new google.visualization.Table(
+            document.getElementById('full_table_div'));
+
+        // Draw the table
+        full_table.draw(niceData, {showRowNumber: false, width: '100%', height: '100%'});
+
+      }
 
 
     </script>
   </head>
-
   <style>
-  table, th, td {
-    border:1px solid black;
-  }
-  .goog-menu-vertical {
-    max-height: 150px;
-    max-width: 300px;
-    text-align: left;
-    overflow-y: auto;
-  }
-
+    table, th, td {
+      border:1px solid black;
+    }
+    .goog-menu-vertical {
+      max-height: 500px;
+      max-width: 300px;
+      text-align: left;
+      overflow-y: auto;
+    }
   </style>
-
   <body>
+    <br>
+    <h1>The UHM: GA Base Salary Plots</h1>
+    <p style="font-size: 20px">Below are some plots made with the publically avaiable Graduate Assistance Compensation data from 2022!</p>
+    <a href="https://manoa.hawaii.edu/graduate/compensation-tax-withholding/" style="font-size: 18px">Here is the conversion table for GA Payscale Step to Compensation</a>
+
+    <div id="dashboard_div" >
+      <table align="center" cellpadding="0" style="width: 100%;">
+        <tr valign="top">
+          <td style="width: 80%;" align="center">
+            <br>
+            <p style="font-size: 20px"><b>Histogram of GA Pay by Department</b><br>
+              Use the Department Selector to the right!</p>
+            <div id="the_plot_div" style="align: center; height: 600px;"></div>
+          </td>
+          <td style="width: 20%;" align="center">
+            <br>
+            <p style="font-size: 20px"><b>Department Selector (Type Supported!)</b></p>
+            <div id="the_filter_div" style="align: center; height: 600px;"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
     <table align="center" cellpadding="0" style="width: 100%;">
       <tr valign="top">
-        <td colSpan=2 align="center" style="text-align:center;">
+        <td style="width: 50%;" align="center">
           <br>
-          <h1>The UHM: GA Base Salary Plots</h1>
-          <p style="font-size: 20px">Below are some plots made with the publically avaiable Graduate Assistance Compensation data from 2022!</p>
-        </td>
-      </tr>
-      <tr>
-        <td colSpan=2 align="center">
-          <div id="dashboard_div" style="align: center; width: 100%; height: 900px;">
-            <div id="the_filter_div" style="align: center; width: 20%; height: 100px; font-size: 20;"></div>
-            <div id="the_plot_div" style="align: center; width: 80%; height: 800px;"></div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td style="width: 50%;" align="center">
-          <div id="pivot_bar_div" style="align: center; width: 100%; height: 800px;"></div>
+          <p style="font-size: 20px"><b>Overall Histogram of GA Pay</b>
+          <div id="overall_hist_div" style="align: center; height: 600px;"></div>
         </td>
         <td style="width: 50%;" align="center">
-          <div id="pivot_bar2_div" style="align: center; width: 100%; height: 800px;"></div>
+          <br>
+          <p style="font-size: 20px"><b>Percent Breakdown of GA Pay by Department</b>
+          <div id="pay_percent_div" style="align: center; height: 600px;"></div>
         </td>
       </tr>
-      <tr><td colSpan=2><br></td></tr>
       <tr>
-        <td colSpan=2 align="center">
-          <div id="full_table_div" style="align: center; width: 1000px; height: 300px;"></div>
-        </td>
-      </tr>
-      <tr><td colSpan=2><br></td></tr>
-      <tr>
-        <td colSpan=2 align="center">
-          <div id="view_hist" style="align: center; width: 1000px; height: 300px;"></div>
+        <td colSpan=2 align="center" style="height: 500px">
+          <br>
+          <p style="font-size: 20px"><b>Data of the GA Pay</b>
+          <div id="full_table_div" style="align: center; width: 1000px; height: 400px;"></div>
         </td>
       </tr>
     </table>
+    <br>
+    <br>
+
+
+
   </body>
 </html>
