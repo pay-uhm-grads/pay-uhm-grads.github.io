@@ -9,9 +9,13 @@
 
       // Calling the Functions
       google.charts.setOnLoadCallback(initialize_the_plot);
-      google.charts.setOnLoadCallback(initialize_overall_hist);
-      google.charts.setOnLoadCallback(initialize_pay_percent);
-      google.charts.setOnLoadCallback(initialize_data_table);
+
+      // set color vars
+      var pastel_pink = '#EFA9AE';
+      var english_lavander = '#B5838D';
+      var old_mauve = '#6D213C';
+      var ebony = '#5F634F';
+      var ash_grey = '#CAD2C5';
 
       // Load The data to be used in the Main Plot
       function initialize_the_plot() {
@@ -20,31 +24,6 @@
 
         the_plot_query.send(make_the_plot);
       }
-
-      // Load the data that has the total count of pay
-      function initialize_overall_hist() {
-        var overall_hist_query = new google.visualization.Query(
-          'https://spreadsheets.google.com/tq?key=1TsSzYte5BAFWg94ZOmVh0xqKbm-ofNWtZxw8MWQTm_o&headers=1');
-
-        overall_hist_query.send(make_overall_hist);
-      }
-
-      // Load the data that has the department breakdown
-      function initialize_pay_percent() {
-        var overall_pay_percent = new google.visualization.Query(
-          'https://spreadsheets.google.com/tq?key=1hYSaDO9c_VMS2Is_1VpoZbBWp1HK_wFMQf-M4GHAWuY&headers=1');
-
-        overall_pay_percent.send(make_pay_percent);
-      }
-
-      // Load the data that has the nice table
-      function initialize_data_table() {
-        var overall_data_table = new google.visualization.Query(
-          'https://spreadsheets.google.com/tq?key=1YarYCKDv2yjVppOXP-f29iC7a5H1kF8kcCaoplJBPyQ&headers=1');
-
-        overall_data_table.send(make_data_table);
-      }
-
 
       // Make The PLOT
       function make_the_plot(response) {
@@ -70,14 +49,14 @@
               'chartArea': {height: '200px'}
             }
           },
-          'state': {'selectedValues': ['SCHOOL OF LIFE SCIENCES']}
+          'state': {'selectedValues': ['ALL DEPT']}
         });
 
         // Function just to get a array of ascending ints...
         function range(start, end) {
           return Array(end - start + 1).fill().map((_, idx) => start + idx)
         }
-        var result = range(1, 120);
+        var result = range(1, 121);
         //result.unshift(0);
 
         // This is the chart AKA THE PLOT
@@ -86,13 +65,15 @@
           'containerId': 'the_plot_div',
           'options': {
             'legend': { position: 'none' },
-            'title': 'Histogram of GA Base Salary of SCHOOL OF LIFE SCIENCES',
-            'chartArea': {width: '75%', height: '75%', top: '5%'},
+            'title': 'Histogram of 2022 GA Base Salary for ALL DEPT',
+            'fontsize': '5em',
+            'chartArea': {width: '85%', height: '75%', top: '5%'},
             'isStacked': true,
+            colors: [old_mauve],
             bar: {groupWidth: "26"},
             hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
             slantedText: true, slantedTextAngle:90, format: '$##,###', title: 'base salary',
-            minValue: 18500, maxValue: 36000},
+            minValue: 18000, maxValue: 36500},
             vAxis: {format: '####', title: 'Number of GAs'}
           },
           'view': {'columns': result}
@@ -104,8 +85,9 @@
         // function to change title
         function changeTitle () {
           var department = sectionChooser.getState().selectedValues[0];
-          let pre_title = "Histogram of GA Base Salary of ";
+          let pre_title = "Histogram of 2022 GA Base Salary for ";
           the_plot.setOption('title', pre_title.concat(department));
+          the_plot.setOption('bar.groupWidth', "26");
           the_plot.draw();
         }
 
@@ -120,96 +102,18 @@
 
       }
 
-      // Make overall histogram
-      function make_overall_hist(response) {
-        // In case the URL doesn't work
-        if (response.isError()) {
-          alert('Error in pivot query');
-        }
-
-        // Get the data from the URL
-        var overallData = response.getDataTable();
-
-        // set bar_options
-        var bar_options = {
-          legend: { position: 'none' },
-          isStacked: false,
-          width: '100%',
-          height: '100%',
-          bar: {groupWidth: "69%"},
-          chartArea: {width: '75%', height: '75%', top: '3%'},
-          hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
-          slantedText: true, slantedTextAngle:90, format: '$##,###', title: 'base salary',
-          minValue: 18500, maxValue: 36000},
-          vAxis: {format: '####', title: 'Number of GAs'}
-        };
-
-        // make the bar plot
-        var overall_hist = new google.visualization.ColumnChart(document.getElementById("overall_hist_div"));
-
-        // Draw the chart
-        overall_hist.draw(overallData, bar_options);
-      }
-
-
-      // Make overall histogram
-      function make_pay_percent(response) {
-        // In case the URL doesn't work
-        if (response.isError()) {
-          alert('Error in pivot query');
-        }
-
-        // Get the data from the URL
-        var breakdownData = response.getDataTable();
-
-        // set bar_options
-        var bar_options = {
-          legend: { position: 'none' },
-          isStacked: 'percent',
-          width: '100%',
-          height: '100%',
-          bar: {groupWidth: "69%"},
-          chartArea: {width: '75%', height: '75%', top: '3%'},
-          hAxis: {ticks: [18930, 19686, 20472, 21288, 22140, 23028, 23952, 24912, 25908, 26946, 28026, 29148, 30312, 31524, 32784, 34098, 35460],
-          slantedText: true, slantedTextAngle:90, format: '$##,###', title: 'base salary',
-          minValue: 18500, maxValue: 36000},
-          vAxis: {title: 'Percentage'}
-        };
-
-        // make the bar plot
-        var pay_percent = new google.visualization.ColumnChart(document.getElementById("pay_percent_div"));
-
-        // Draw the chart
-        pay_percent.draw(breakdownData, bar_options);
-      }
-
-      // Make nice data table
-      function make_data_table(response) {
-        // In case the URL doesn't work
-        if (response.isError()) {
-          alert('Error in pivot query');
-        }
-
-        // Get the data from the URL
-        var niceData = response.getDataTable();
-
-        // make a table with the data we just loaded
-        var full_table = new google.visualization.Table(
-            document.getElementById('full_table_div'));
-
-        // Draw the table
-        full_table.draw(niceData, {showRowNumber: false, width: '100%', height: '100%'});
-
-      }
-
 
     </script>
   </head>
   <style>
+    .titles h1, h2, h4{
+      margin: 0;
+    }
     th, td {
-      border: 5px solid black;
-      border-style: inset;
+      border: 5px solid #5F634F;
+      border-style: solid;
       border-radius: 20px;
+      background-clip: padding-box;
     }
     .goog-menu-vertical {
       max-height: 600px;
@@ -217,56 +121,42 @@
       text-align: left;
       overflow-y: auto;
     }
+    body {
+      background-color: white;
+    }
   </style>
   <body>
-    <br>
-    <h1 align="center">The UHM: GA Base Salary Plots</h1>
-    <p align="center" style="font-size: 20px">Below are some plots made with the publically avaiable Graduate Assistance Compensation data from 2022!</p>
-    <p align="center"><a href="https://form.jotform.com/220947446792063"style="font-size: 28px"><b>SIGN THE PETITION!!</b></a></p>
-
+    <div class="titles">
+      <h1 align="center">Graduate Assistance Base Salary Distributions</h1>
+      <h2 align="center">-University of Hawaiʻi at Mānoa-</h2>
+      <!--<p align="center" style="margin: 0">Last Updated: May 2022<p>-->
+    </div>
     <div id="dashboard_div" >
-      <table align="center" cellpadding="0" style="width: 100%;">
-        <tr valign="top">
-          <td style="width: 80%;" align="center">
-            <br>
-            <p style="font-size: 20px"><b>Histogram of GA Pay by Department</b><br>
-              Use the Department Selector to the right!</p>
-            <div id="the_plot_div" style="align: center; height: 600px;"></div>
-          </td>
-          <td style="width: 20%;" align="center">
-            <br>
-            <p style="font-size: 20px"><b>Department Selector (Type Supported!)</b></p>
-            <div id="the_filter_div" style="align: center; height: 600px;"></div>
+      <table align="center" cellpadding="10px" style="width: 100%;">
+        <tr>
+          <td style="width: 100%; margin: 0px;" align="center">
+            <p style="font-size: 1.5em; margin: 0.3em;">Choose your Department!</p>
+            <div id="the_filter_div" style="align: center; height: 1.5em;"></div>
           </td>
         </tr>
+        <tr valign="top">
+          <td style="width: 100%;" align="center">
+            <br>
+            <div id="the_plot_div" style="align: center; height: 550px;"></div>
+          </td>
+        </tr>
+
       </table>
     </div>
 
-    <table align="center" cellpadding="0" style="width: 100%;">
-      <tr valign="top">
-        <td style="width: 50%;" align="center">
-          <br>
-          <p style="font-size: 20px"><b>Overall Histogram of GA Pay</b>
-          <div id="overall_hist_div" style="align: center; height: 600px;"></div>
-        </td>
-        <td style="width: 50%;" align="center">
-          <br>
-          <p style="font-size: 20px"><b>Percent Breakdown of GA Pay by Department</b>
-          <div id="pay_percent_div" style="align: center; height: 600px;"></div>
-        </td>
-      </tr>
-      <tr>
-        <td colSpan=2 align="center" style="height: 500px">
-          <br>
-          <p style="font-size: 20px"><b>Data of the GA Pay</b>
-          <div id="full_table_div" style="align: center; width: 1000px; height: 400px;"></div>
-        </td>
-      </tr>
-    </table>
+    <h2 align="center" style="margin: 0.2em;"> Compare with Oceanography!</h2>
+    <p align="center" style='margin: 0.25em; font-size: 1.2em'> The students' at Oceanography put together <a href="https://www.soest.hawaii.edu/oceanography/policies/Graduate%20Student%20Stipend%20Rates%207-2016.pdf"> a document</a> and negotiated with their department to get better pay. Join our fight to negotiate a living wage for all GAs!</p>
+
+    <p align="center" style='margin: 0.75em;'><a href="https://form.jotform.com/220947446792063"style="font-size: 2em"><b>SIGN THE PETITION!!</b></a></p>
+    <p align="center" style='margin: 0.15em; font-size: 1.2em'><a href="https://academiclaborunited.org/member"> MORE INFO HERE</a></p>
+
     <br>
     <br>
-
-
 
   </body>
 </html>
