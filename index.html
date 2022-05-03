@@ -100,6 +100,12 @@
         // Draw the dashboard
         dashboard.draw(pivotData);
 
+        // make an oceanography selector
+        setOcean = function() {
+          sectionChooser.setState({'selectedValues': ['OCEANOGRAPHY']});
+          sectionChooser.draw();
+        };
+
       }
 
 
@@ -124,6 +130,28 @@
     body {
       background-color: white;
     }
+    .btn {
+      border: 2px solid black;
+      border-radius: 10px;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 1.5em;
+      margin: 0.3em;
+      cursor: pointer;
+      text-align: center;
+    }
+    .ocean {
+      background-color: white;
+      border-color: #6D213C;
+      color: #6D213C;
+    }
+    .ocean:hover {
+      background-color: #6D213C;
+      color: white;
+    }
+    .justCenter {
+      text-align: center
+    }
+
   </style>
   <body>
     <div class="titles">
@@ -149,11 +177,15 @@
       </table>
     </div>
 
-    <h2 align="center" style="margin: 0.2em;"> Compare with Oceanography!</h2>
-    <p align="center" style='margin: 0.25em; font-size: 1.2em'> The students' at Oceanography put together <a href="https://www.soest.hawaii.edu/oceanography/policies/Graduate%20Student%20Stipend%20Rates%207-2016.pdf"> a document</a> and negotiated with their department to get better pay. Join our fight to negotiate a living wage for all GAs!</p>
+    <div class='justCenter'>
+    <button class="btn ocean" onclick="setOcean();">Compare with Oceanography!</button>
+    </div>
 
-    <p align="center" style='margin: 0.75em;'><a href="https://form.jotform.com/220947446792063"style="font-size: 2em"><b>SIGN THE PETITION!!</b></a></p>
-    <p align="center" style='margin: 0.15em; font-size: 1.2em'><a href="https://academiclaborunited.org/member"> MORE INFO HERE</a></p>
+    <p align="center" style='margin: 0.25em; font-size: 1.2em'> The students' at Oceanography put together
+      <a href="https://www.soest.hawaii.edu/oceanography/policies/Graduate%20Student%20Stipend%20Rates%207-2016.pdf"> a document</a>
+      and negotiated with their department to get better pay. Join our fight to negotiate a living wage for all GAs!</p>
+    <p align="center" style='margin: 0.55em;'><a href="https://form.jotform.com/220947446792063"style="font-size: 2em"><b>SIGN THE PETITION!!</b></a></p>
+    <p align="center" style='margin: 0.15em; font-size: 1.2em'><a href="https://academiclaborunited.org/member">Become an ALU Member</a></p>
 
     <br>
     <br>
